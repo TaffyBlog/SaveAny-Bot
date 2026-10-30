@@ -2,6 +2,7 @@ package fsutil
 
 import (
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,6 +59,31 @@ func CreateFile(fp string) (*File, error) {
 		return nil, err
 	}
 	return &File{File: file}, nil
+}
+
+// OpenResumeFile opens (or creates) the file without truncating it and
+// returns the file plus its current size, so callers can resume a partial
+// download by appending to it. The write offset is positioned at the end
+// of the file, so plain Write calls append instead of overwriting the
+// existing bytes from offset 0.
+func OpenResumeFile(fp string) (*File, int64, error) {
+	if err := os.MkdirAll(filepath.Dir(fp), os.ModePerm); err != nil {
+		return nil, 0, err
+	}
+	file, err := os.OpenFile(fp, os.O_RDWR|os.O_CREATE, 0o644)
+	if err != nil {
+		return nil, 0, err
+	}
+	fi, err := file.Stat()
+	if err != nil {
+		file.Close()
+		return nil, 0, err
+	}
+	if _, err := file.Seek(0, io.SeekEnd); err != nil {
+		file.Close()
+		return nil, 0, err
+	}
+	return &File{File: file}, fi.Size(), nil
 }
 
 func NormalizePathname(s string) string {
