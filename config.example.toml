@@ -40,6 +40,11 @@ remove_after_transfer = true
 
 # yt-dlp 视频下载配置 / yt-dlp video download configuration
 [ytdlp]
+# yt-dlp 可执行文件路径, 可以是绝对路径或依赖 $PATH 解析的名字; 默认 "yt-dlp"
+# 官方 Docker 镜像内已内置 yt-dlp, 默认值即可用
+# Path to the yt-dlp executable; absolute path or a name resolvable via $PATH.
+# Default "yt-dlp" (the official Docker image ships yt-dlp in $PATH)
+path = "yt-dlp"
 # 默认下载的最高视频清晰度 (按高度限制), 如 1080, 720, 480; 0 表示不限制 (下载最佳画质)
 # Max video resolution by height, e.g. 1080, 720, 480; 0 means no limit (best available)
 # 仅在使用 /ytdlp 命令且未手动指定任何参数时生效
@@ -62,6 +67,15 @@ filename_template = "%(title)s.%(ext)s"
 # 将文件名限制为 ASCII 字符 (yt-dlp --restrict-filenames), 会丢弃标题中的非拉丁字符、空格和 &
 # Restrict file names to ASCII characters (yt-dlp --restrict-filenames): drops non-latin characters, spaces and & from titles
 restrict_filenames = false
+# yt-dlp 使用的 cookies 文件 (Netscape 格式, 如从已登录浏览器导出的 cookies.txt),
+# 传给 yt-dlp --cookies, 用于下载需要登录的内容 (如 X 的敏感内容 NSFW). 留空则不使用
+# Cookies file in Netscape format passed to yt-dlp via --cookies, for
+# age-gated / login-required content (e.g. NSFW posts on X). Empty disables it
+cookies_file = ""
+# 解析器无法处理消息中的链接或全部解析失败时, 自动改用 yt-dlp 下载这些链接
+# Fall back to yt-dlp for the URLs in a text message when no parser can
+# handle them or all matching parsers fail
+fallback = false
 
 # 解析器配置 / Parser configuration
 [parser]

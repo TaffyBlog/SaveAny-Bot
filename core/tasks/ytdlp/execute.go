@@ -99,8 +99,18 @@ func buildDownloadCommand(cfg config.YtdlpConfig, tempDir string, flags []string
 	}
 
 	cmd := ytdlp.New().Output(base)
+	// Explicit executable path (default "yt-dlp" resolved via $PATH): without
+	// it the library may end up with an empty executable name.
+	if cfg.Path != "" {
+		cmd = cmd.SetExecutable(cfg.Path)
+	}
 	if cfg.RestrictFilenames {
 		cmd = cmd.RestrictFilenames()
+	}
+	// Cookies apply regardless of custom flags: they authenticate the request,
+	// they are not a format choice.
+	if cfg.CookiesFile != "" {
+		cmd = cmd.Cookies(cfg.CookiesFile)
 	}
 
 	// Format/quality defaults only apply when the user passes no custom flags.

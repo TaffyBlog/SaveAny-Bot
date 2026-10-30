@@ -136,11 +136,14 @@ func Init(ctx context.Context, configFile ...string) error {
 		"api.port":   8080,
 		"api.token":  "",
 
+		"ytdlp.path":               "yt-dlp",
 		"ytdlp.recode":             "mp4",
 		"ytdlp.filename_template":  DefaultYtdlpFilenameTemplate,
 		"ytdlp.max_height":         0,
 		"ytdlp.format":             "",
 		"ytdlp.restrict_filenames": false,
+		"ytdlp.cookies_file":       "",
+		"ytdlp.fallback":           false,
 	}
 
 	for key, value := range defaultConfigs {

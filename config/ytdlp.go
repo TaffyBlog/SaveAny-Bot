@@ -4,6 +4,10 @@ package config
 const DefaultYtdlpFilenameTemplate = "%(title)s.%(ext)s"
 
 type YtdlpConfig struct {
+	// Path is the path to the yt-dlp executable. Use an absolute path or a
+	// name resolvable via $PATH (default "yt-dlp"). The official Docker image
+	// ships yt-dlp in $PATH, so the default works there.
+	Path string `toml:"path" mapstructure:"path" json:"path"`
 	// MaxHeight limits the video resolution by height in pixels (e.g. 1080, 720).
 	// 0 means no limit (best available). Ignored when Format is set.
 	MaxHeight int `toml:"max_height" mapstructure:"max_height" json:"max_height"`
@@ -19,4 +23,13 @@ type YtdlpConfig struct {
 	// RestrictFilenames keeps file names ASCII-only (yt-dlp --restrict-filenames),
 	// dropping non-latin characters from titles. Disabled by default.
 	RestrictFilenames bool `toml:"restrict_filenames" mapstructure:"restrict_filenames" json:"restrict_filenames"`
+	// CookiesFile is the path to a cookies file in Netscape format (e.g.
+	// cookies.txt exported from a logged-in browser), passed to yt-dlp via
+	// --cookies. Used for age-gated / login-required content such as NSFW
+	// posts on X. Empty disables it.
+	CookiesFile string `toml:"cookies_file" mapstructure:"cookies_file" json:"cookies_file"`
+	// Fallback: when no parser can handle the URLs in a text message, or all
+	// matching parsers fail, fall back to yt-dlp for those URLs instead of
+	// ignoring the message.
+	Fallback bool `toml:"fallback" mapstructure:"fallback" json:"fallback"`
 }
