@@ -3,8 +3,9 @@ name: Build Docker image
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   workflow_dispatch:
+# 说明: v* 标签的多架构 (amd64/arm64, default/micro/pico) 镜像
+# 由 build-docker.yml 单独构建, 此处仅处理 main 分支的 latest 快照.
 
 env:
   REGISTRY: ghcr.io

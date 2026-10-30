@@ -27,23 +27,22 @@
    - `docker-compose.yml` (来自 `deploy/docker-compose.yml`)
    - `config.toml` (来自 `deploy/config.toml`, 填好所有 "!!必改!!" 项)
    - `cookies.txt` (可选)
-   - 整个 fork 仓库源码 (compose 采用本地构建, 含本 fork 改动)
-   目录结构参见 `deploy/docker-compose.yml` 顶部注释。
+   - `plugins/getxbot_parser.js` (放到 NAS 的 `plugins/` 目录, getxbot 兜底插件需要)
 
-   > **免构建方式**: 代码推送到 GitHub 后, Actions 会自动构建镜像并发布到
-   > `ghcr.io/taffyblog/saveany-bot:latest` (workflow: `.github/workflows/docker.yml`)。
-   > NAS 上把 compose 里的 `build: .` 换成 `image: ghcr.io/taffyblog/saveany-bot:latest`
-   > 即可直接拉取, 无需上传源码。首次使用需 `docker login ghcr.io`, 且该镜像包默认
-   > 为 private, 可在 GitHub 仓库 → Packages 里改为 public。
+   **不需要上传源码**: compose 默认拉取 GitHub Actions 自动构建的镜像
+   `ghcr.io/taffyblog/saveany-bot:latest` (push 到 main 自动更新, 已设为 Public, 免登录直接拉取)。
+   不想用 GHCR 时, 把 compose 里的 `image` 换成 `build: .` 并上传整个 fork 仓库源码。
 3. **修改 config.toml**:
    - `[telegram] token`
    - `[[users]] id` (仅你自己的 id, 非白名单用户会被拒绝)
    - 需要代理时: `[telegram.proxy]` (连 Telegram) 与 `[parser.twitter] proxy` (连 fxtwitter API) 是两条独立配置; compose 中的 `HTTP_PROXY/HTTPS_PROXY` 环境变量影响容器内其余出网 (yt-dlp 等)。
-4. **构建并启动**:
+4. **启动**:
    ```bash
-   docker compose up -d --build
+   docker compose up -d
    docker compose logs -f
    ```
+
+   以后更新版本: `docker compose pull && docker compose up -d`。
 5. **初始化 Bot (一次性, 在 Telegram 里做)**:
    - 向你的 Bot 发送 `/start`
    - `/storage` → 选择 `nas-local` 设为默认存储
@@ -84,6 +83,7 @@
 | `client/bot/handlers/parse.go` | 文本消息解析失败/无解析器时, 可选回退 yt-dlp (`[ytdlp] fallback`) |
 | `parsers/native/twitter/parser.go` | 文件名改为 昵称(@handle)_推文内容.ext (原为 twimg 随机对象名) |
 | `plugins/getxbot_parser.js` | 新增 getxbot 兜底解析插件 |
-| `.github/workflows/docker.yml` | push 时自动构建镜像并发布到 GHCR |
+| `.github/workflows/docker.yml` | push main 时自动构建镜像并发布到 GHCR (latest/sha 标签) |
+| `.github/workflows/build-docker.yml` | 打 v* 标签时构建多架构多变体镜像 (上游写死 krau 的镜像名, 已改为 fork 自己的) |
 | `config.example.toml` | 文档同步 |
 | `deploy/` | 生产配置模板 + compose + 本文档 |

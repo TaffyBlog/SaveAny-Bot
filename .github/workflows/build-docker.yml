@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: krau/saveany-bot
+  IMAGE_NAME: taffyblog/saveany-bot # fork: 上游为 krau/saveany-bot, 无权限推送, 改为 fork 自己的镜像名
 
 concurrency:
   group: docker-build-${{ github.repository }}

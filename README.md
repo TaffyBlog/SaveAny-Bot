@@ -6,14 +6,19 @@
 
 > **Save Any Telegram File to Anywhere 📂. Support restrict saving content and beyond telegram.**
 
-[![Release Date](https://img.shields.io/github/release-date/krau/saveany-bot?label=release)](https://github.com/krau/saveany-bot/releases)
-[![tag](https://img.shields.io/github/v/tag/krau/saveany-bot.svg)](https://github.com/krau/saveany-bot/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/krau/saveany-bot/build-release.yml)](https://github.com/krau/saveany-bot/actions/workflows/build-release.yml)
-[![Stars](https://img.shields.io/github/stars/krau/saveany-bot?style=flat)](https://github.com/krau/saveany-bot/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/krau/saveany-bot/total)](https://github.com/krau/saveany-bot/releases)
-[![Issues](https://img.shields.io/github/issues/krau/saveany-bot)](https://github.com/krau/saveany-bot/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/krau/saveany-bot?label=pr)](https://github.com/krau/saveany-bot/pulls)
-[![License](https://img.shields.io/github/license/krau/saveany-bot)](./LICENSE)
+> [!NOTE]
+> This is a personal fork of [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot) with enhancements for auto-downloading X/Twitter videos at the best quality to a local NAS directory:
+> - Multi-level parser fallback chain (fxtwitter → getxbot plugin → yt-dlp with cookies)
+> - Resumable downloads with integrity verification (Range requests)
+> - Human-readable filenames derived from tweet author and text
+> - yt-dlp `cookies_file` / `fallback` / `path` options
+>
+> Docker image: `ghcr.io/taffyblog/saveany-bot:latest` (built automatically by GitHub Actions on every push to `main`).
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/TaffyBlog/SaveAny-Bot/docker.yml?label=build)](https://github.com/TaffyBlog/SaveAny-Bot/actions/workflows/docker.yml)
+[![Stars](https://img.shields.io/github/stars/TaffyBlog/SaveAny-Bot?style=flat)](https://github.com/TaffyBlog/SaveAny-Bot/stargazers)
+[![Issues](https://img.shields.io/github/issues/TaffyBlog/SaveAny-Bot)](https://github.com/TaffyBlog/SaveAny-Bot/issues)
+[![License](https://img.shields.io/github/license/TaffyBlog/SaveAny-Bot)](./LICENSE)
 
 </div>
 
@@ -69,10 +74,10 @@ Run Save Any Bot with Docker:
 docker run -d --name saveany-bot \
     -v ./config.toml:/app/config.toml \
     -v ./downloads:/app/downloads \
-    ghcr.io/krau/saveany-bot:latest
+    ghcr.io/taffyblog/saveany-bot:latest
 ```
 
-Please [**read the docs**](https://sabot.unv.app/en/) for more configuration options and usage.
+Please [**read the docs**](https://sabot.unv.app/en/) for more configuration options and usage (upstream documentation; see [DEPLOY.md](./DEPLOY.md) for this fork's NAS deployment guide).
 
 ## Sponsors
 

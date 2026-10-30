@@ -1,6 +1,6 @@
 services:
   saveany-bot:
-    image: ghcr.io/krau/saveany-bot:latest
+    image: ghcr.io/taffyblog/saveany-bot:latest # fork 镜像 (上游 ghcr.io/krau/saveany-bot 不含本 fork 改动)
     container_name: saveany-bot
     restart: unless-stopped
     ports:

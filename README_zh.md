@@ -4,14 +4,19 @@
 
 > **把 Telegram 上的文件转存到多种存储端**
 
-[![Release Date](https://img.shields.io/github/release-date/krau/saveany-bot?label=release)](https://github.com/krau/saveany-bot/releases)
-[![tag](https://img.shields.io/github/v/tag/krau/saveany-bot.svg)](https://github.com/krau/saveany-bot/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/krau/saveany-bot/build-release.yml)](https://github.com/krau/saveany-bot/actions/workflows/build-release.yml)
-[![Stars](https://img.shields.io/github/stars/krau/saveany-bot?style=flat)](https://github.com/krau/saveany-bot/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/krau/saveany-bot/total)](https://github.com/krau/saveany-bot/releases)
-[![Issues](https://img.shields.io/github/issues/krau/saveany-bot)](https://github.com/krau/saveany-bot/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/krau/saveany-bot?label=pr)](https://github.com/krau/saveany-bot/pulls)
-[![License](https://img.shields.io/github/license/krau/saveany-bot)](./LICENSE)
+> [!NOTE]
+> 本仓库是 [krau/SaveAny-Bot](https://github.com/krau/SaveAny-Bot) 的个人二开 fork, 增强: **发推文链接 → 自动以最高画质下载视频到 NAS 本地目录**
+> - 多级解析兜底链 (fxtwitter → getxbot 插件 → yt-dlp+cookies)
+> - 断点续传 + 下载完整性校验 (Range 请求, 字节数不符自动重试)
+> - 按"昵称(@handle)_推文内容"生成可读文件名
+> - yt-dlp 新增 `cookies_file` / `fallback` / `path` 配置
+>
+> Docker 镜像: `ghcr.io/taffyblog/saveany-bot:latest` (每次 push 到 main 由 GitHub Actions 自动构建). 部署见 [DEPLOY.md](./DEPLOY.md).
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/TaffyBlog/SaveAny-Bot/docker.yml?label=build)](https://github.com/TaffyBlog/SaveAny-Bot/actions/workflows/docker.yml)
+[![Stars](https://img.shields.io/github/stars/TaffyBlog/SaveAny-Bot?style=flat)](https://github.com/TaffyBlog/SaveAny-Bot/stargazers)
+[![Issues](https://img.shields.io/github/issues/TaffyBlog/SaveAny-Bot)](https://github.com/TaffyBlog/SaveAny-Bot/issues)
+[![License](https://img.shields.io/github/license/TaffyBlog/SaveAny-Bot)](./LICENSE)
 
 </div>
 
@@ -66,10 +71,10 @@ blacklist = true
 docker run -d --name saveany-bot \
     -v ./config.toml:/app/config.toml \
     -v ./downloads:/app/downloads \
-    ghcr.io/krau/saveany-bot:latest
+    ghcr.io/taffyblog/saveany-bot:latest
 ```
 
-请 [**查看文档**](https://sabot.unv.app/) 以获取更多配置选项和使用方法.
+请 [**查看文档**](https://sabot.unv.app/) 以获取更多配置选项和使用方法 (上游文档; 本 fork 的 NAS 部署指南见 [DEPLOY.md](./DEPLOY.md)).
 
 ## 赞助
 
