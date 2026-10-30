@@ -7,8 +7,10 @@
 #   data/ downloads/ cache/ 首次启动自动创建
 services:
   saveany-bot:
-    build: . # 在 fork 仓库根目录构建 (含本项目改动); 也可替换为自建镜像名
-    # image: ghcr.io/krau/saveany-bot:latest # 上游镜像不含本 fork 的改动, 勿直接使用
+    build: . # 在 fork 仓库根目录构建 (含本项目改动)
+    # 推送到 GitHub 后 Actions 会自动构建 GHCR 镜像, 可改用 (NAS 免构建直接拉取):
+    # image: ghcr.io/taffyblog/saveany-bot:latest
+    # 上游官方镜像 ghcr.io/krau/saveany-bot 不含本 fork 的改动, 勿直接使用
     container_name: saveany-bot
     restart: unless-stopped
     volumes:

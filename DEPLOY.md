@@ -29,6 +29,12 @@
    - `cookies.txt` (可选)
    - 整个 fork 仓库源码 (compose 采用本地构建, 含本 fork 改动)
    目录结构参见 `deploy/docker-compose.yml` 顶部注释。
+
+   > **免构建方式**: 代码推送到 GitHub 后, Actions 会自动构建镜像并发布到
+   > `ghcr.io/taffyblog/saveany-bot:latest` (workflow: `.github/workflows/docker.yml`)。
+   > NAS 上把 compose 里的 `build: .` 换成 `image: ghcr.io/taffyblog/saveany-bot:latest`
+   > 即可直接拉取, 无需上传源码。首次使用需 `docker login ghcr.io`, 且该镜像包默认
+   > 为 private, 可在 GitHub 仓库 → Packages 里改为 public。
 3. **修改 config.toml**:
    - `[telegram] token`
    - `[[users]] id` (仅你自己的 id, 非白名单用户会被拒绝)
@@ -67,12 +73,17 @@
 
 | 文件 | 改动 |
 |------|------|
-| `config/ytdlp.go` | 新增 `cookies_file`、`fallback` 配置项 |
-| `config/viper.go` | 上述两项的默认值 |
-| `core/tasks/ytdlp/execute.go` | 将 cookies 传给 yt-dlp (`--cookies`) |
+| `config/ytdlp.go` | 新增 `cookies_file`、`fallback`、`path` 配置项 |
+| `config/viper.go` | 上述各项的默认值 |
+| `core/tasks/ytdlp/execute.go` | 将 cookies 传给 yt-dlp (`--cookies`); 应用 `path` 指定的可执行文件 |
+| `api/media.go` | 元数据提取同样应用 `path` 指定的 yt-dlp |
+| `common/utils/fsutil/fs.go` | 新增 `OpenResumeFile` (不截断打开并定位到文件尾) |
+| `core/tasks/parsed/execute.go` | 下载失败断点续传 (Range) + 完整性校验 (字节数与预期不符自动重试) |
 | `parsers/parser.go` | 解析失败时继续尝试下一个匹配的解析器 (兜底链) |
 | `parsers/js/api.go` | JS 插件 ghttp 新增 `postJSON` |
 | `client/bot/handlers/parse.go` | 文本消息解析失败/无解析器时, 可选回退 yt-dlp (`[ytdlp] fallback`) |
+| `parsers/native/twitter/parser.go` | 文件名改为 昵称(@handle)_推文内容.ext (原为 twimg 随机对象名) |
 | `plugins/getxbot_parser.js` | 新增 getxbot 兜底解析插件 |
+| `.github/workflows/docker.yml` | push 时自动构建镜像并发布到 GHCR |
 | `config.example.toml` | 文档同步 |
 | `deploy/` | 生产配置模板 + compose + 本文档 |
