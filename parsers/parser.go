@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/charmbracelet/log"
+
 	"github.com/krau/SaveAny-Bot/parsers/js"
 	"github.com/krau/SaveAny-Bot/parsers/native/kemono"
 	"github.com/krau/SaveAny-Bot/parsers/native/twitter"
@@ -24,16 +26,24 @@ func ParseWithContext(ctx context.Context, url string) (*parser.Item, error) {
 	errCh := make(chan error, 1)
 
 	go func() {
+		var lastErr error
+		// Try every parser that can handle the URL; a failure of one parser
+		// should not prevent the next one from acting as a fallback.
 		for _, pser := range parsers.Get() {
 			if !pser.CanHandle(url) {
 				continue
 			}
 			item, err := pser.Parse(ctx, url)
 			if err != nil {
-				errCh <- err
-				return
+				log.FromContext(ctx).Warnf("Parser %s failed to parse %s: %v, trying next parser if any", pserName(pser), url, err)
+				lastErr = err
+				continue
 			}
 			ch <- item
+			return
+		}
+		if lastErr != nil {
+			errCh <- lastErr
 			return
 		}
 		errCh <- ErrNoParserFound
@@ -47,6 +57,13 @@ func ParseWithContext(ctx context.Context, url string) (*parser.Item, error) {
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
+}
+
+func pserName(p parser.Parser) string {
+	if c, ok := p.(parser.ConfigurableParser); ok {
+		return c.Name()
+	}
+	return "unknown"
 }
 
 // CanHandle checks if any registered parser can handle the given URL and returns the parser if found.
