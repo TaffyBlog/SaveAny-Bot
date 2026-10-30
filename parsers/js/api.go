@@ -3,6 +3,7 @@
 package js
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -99,6 +100,8 @@ jsGhttp provides a http helper for js plugins
 It provides the following functions:
   - get(url): performs a GET request and returns the response body as string
   - getJSON(url): performs a GET request and returns the response body parsed as JSON
+  - postJSON(url, body): performs a POST request with a JSON body and returns
+    the response body parsed as JSON
   - head(url): performs a HEAD request and returns the response headers and status code
 */
 var jsGhttp = func(vm *goja.Runtime) *goja.Object {
@@ -131,6 +134,55 @@ var jsGhttp = func(vm *goja.Runtime) *goja.Object {
 		url := call.Argument(0).String()
 
 		resp, err := client.Get(url)
+		if err != nil {
+			return vm.ToValue(map[string]any{
+				"error": fmt.Sprintf("failed to fetch %s: %v", url, err),
+			})
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return vm.ToValue(map[string]any{
+				"error":  fmt.Sprintf("failed to fetch %s: %s", url, resp.Status),
+				"status": resp.StatusCode,
+			})
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return vm.ToValue(map[string]any{
+				"error": fmt.Errorf("failed to read response body: %w", err).Error(),
+			})
+		}
+		var jsonData map[string]any
+		if err := json.Unmarshal(body, &jsonData); err != nil {
+			return vm.ToValue(map[string]any{
+				"error": fmt.Errorf("failed to unmarshal JSON: %w", err).Error(),
+			})
+		}
+		return vm.ToValue(map[string]any{
+			"data": jsonData,
+		})
+	})
+	ghttp.Set("postJSON", func(call goja.FunctionCall) goja.Value {
+		url := call.Argument(0).String()
+		bodyArg := call.Argument(1)
+		var bodyReader io.Reader
+		if !goja.IsUndefined(bodyArg) && !goja.IsNull(bodyArg) {
+			data, err := json.Marshal(bodyArg.Export())
+			if err != nil {
+				return vm.ToValue(map[string]any{
+					"error": fmt.Sprintf("failed to serialize request body: %v", err),
+				})
+			}
+			bodyReader = bytes.NewReader(data)
+		}
+		req, err := http.NewRequest(http.MethodPost, url, bodyReader)
+		if err != nil {
+			return vm.ToValue(map[string]any{
+				"error": fmt.Sprintf("failed to create request to %s: %v", url, err),
+			})
+		}
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := client.Do(req)
 		if err != nil {
 			return vm.ToValue(map[string]any{
 				"error": fmt.Sprintf("failed to fetch %s: %v", url, err),

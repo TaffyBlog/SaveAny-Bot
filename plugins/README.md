@@ -143,6 +143,8 @@ if (response.status) {
 }
 ```
 
+**ghttp.postJSON(url: string, body: any)** 发起 POST 请求, 将 `body` 序列化为 JSON 作为请求体 (`Content-Type: application/json`), 并将响应体解析为 JSON 对象, 返回值结构同 `getJSON`. 参考 [getxbot_parser.js](./getxbot_parser.js).
+
 #### Playwright
 
 使用 `playwright` 对象以发起基于浏览器的请求.
