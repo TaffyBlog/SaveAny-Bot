@@ -16,6 +16,16 @@ level = "info" # 稳定运行后建议 info, 排查问题时改 debug
 token = "123456789:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 # 更换 token 后需删除 data/session.db
 
+# 相册(媒体组)处理方式. Telegram 里一个帖子若是多图/多视频, 转发其中一条时
+# 客户端会把整组一起转发, 默认会把整组都保存下来.
+#   batch   全部保存 (上游默认行为)
+#   video   只保存视频, 跳过图片
+#   largest 只保存体积最大的一个 (通常就是主视频)
+#   first   只保存第一条
+album_mode = "batch"
+# 相册聚合窗口(秒): 同一 group 的消息在窗口内收齐后一起建任务
+# media_group_timeout = 1
+
 [telegram.proxy]
 # !!按需!! NAS 无法直连 Telegram 时启用 (与下面 [parser.twitter] proxy 的区别:
 # 这里是 bot 连接 Telegram 服务器用的代理; twitter proxy 是访问 fxtwitter API 用的代理)

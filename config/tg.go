@@ -8,6 +8,7 @@ type telegramConfig struct {
 	RpcRetry          int           `toml:"rpc_retry" mapstructure:"rpc_retry" json:"rpc_retry"`
 	Userbot           userbotConfig `toml:"userbot" mapstructure:"userbot" json:"userbot"`
 	MediaGroupTimeout int           `toml:"media_group_timeout" mapstructure:"media_group_timeout" json:"media_group_timeout"`
+	AlbumMode         string        `toml:"album_mode" mapstructure:"album_mode" json:"album_mode"`
 }
 
 type userbotConfig struct {

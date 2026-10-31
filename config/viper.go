@@ -125,6 +125,7 @@ func Init(ctx context.Context, configFile ...string) error {
 		"telegram.rpc_retry":       5,
 		"telegram.userbot.enable":  false,
 		"telegram.userbot.session": "data/usersession.db",
+		"telegram.album_mode":      "batch",
 
 		"temp.base_path": "cache/",
 
