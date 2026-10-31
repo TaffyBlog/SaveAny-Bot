@@ -186,9 +186,12 @@ func extractDirectMediaMetadata(ctx context.Context, url string) (*MediaMetadata
 
 func extractYTDLPMediaMetadata(ctx context.Context, url string) (*MediaMetadataResponse, error) {
 	cmd := ytdlp.New().DumpSingleJSON()
-	if p := config.C().Ytdlp.Path; p != "" {
-		cmd = cmd.SetExecutable(p)
+	// Same default as task execution: never pass an empty executable name.
+	exePath := config.C().Ytdlp.Path
+	if exePath == "" {
+		exePath = "yt-dlp"
 	}
+	cmd = cmd.SetExecutable(exePath)
 	result, err := cmd.Run(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to inspect media: %w", err)

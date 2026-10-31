@@ -100,10 +100,14 @@ func buildDownloadCommand(cfg config.YtdlpConfig, tempDir string, flags []string
 
 	cmd := ytdlp.New().Output(base)
 	// Explicit executable path (default "yt-dlp" resolved via $PATH): without
-	// it the library may end up with an empty executable name.
-	if cfg.Path != "" {
-		cmd = cmd.SetExecutable(cfg.Path)
+	// it the library may end up with an empty executable name and fail with
+	// "exec: no command". An explicitly empty `path` in the config falls back
+	// to the default name instead of breaking downloads.
+	exePath := cfg.Path
+	if exePath == "" {
+		exePath = "yt-dlp"
 	}
+	cmd = cmd.SetExecutable(exePath)
 	if cfg.RestrictFilenames {
 		cmd = cmd.RestrictFilenames()
 	}
