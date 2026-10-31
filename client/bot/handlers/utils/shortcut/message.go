@@ -35,6 +35,7 @@ func GetFileFromMessageWithReply(ctx *ext.Context, update *ext.Update, message *
 	media := message.Media
 	supported := mediautil.IsSupported(media)
 	if !supported {
+		logger.Warnf("[media] unsupported media type %s on msg %d, ignored", media.TypeName(), message.GetID())
 		return nil, nil, dispatcher.ContinueGroups
 	}
 

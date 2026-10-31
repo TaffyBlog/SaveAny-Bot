@@ -32,6 +32,8 @@ func handleMediaMessage(ctx *ext.Context, update *ext.Update) error {
 	if err != nil {
 		return err
 	}
+	logger.Infof("[media] recv chat=%d msg=%d grouped=0 type=%s size=%d name=%q",
+		update.EffectiveChat().GetID(), message.GetID(), message.Media.TypeName(), file.Size(), file.Name())
 
 	stors := storage.GetUserStorages(ctx, userId)
 	req, err := msgelem.BuildAddOneSelectStorageMessage(ctx, stors, file, msg.ID)
@@ -65,5 +67,7 @@ func handleSilentSaveMedia(ctx *ext.Context, update *ext.Update) error {
 	if err != nil {
 		return err
 	}
+	logger.Infof("[media] recv chat=%d msg=%d grouped=0 type=%s size=%d name=%q",
+		update.EffectiveChat().GetID(), message.GetID(), message.Media.TypeName(), file.Size(), file.Name())
 	return shortcut.CreateAndAddTGFileTaskWithEdit(ctx, userID, stor, dirutil.PathFromContext(ctx), file, msg.ID)
 }

@@ -59,6 +59,8 @@ func handleGroupMediaMessage(ctx *ext.Context, update *ext.Update, message *tg.M
 	media := message.Media
 	supported := mediautil.IsSupported(media)
 	if !supported {
+		logger.Warnf("[album] skip unsupported media chat=%d msg=%d type=%s",
+			update.EffectiveChat().GetID(), message.GetID(), media.TypeName())
 		return dispatcher.EndGroups
 	}
 	userId := update.GetUserChat().GetID()
@@ -72,13 +74,18 @@ func handleGroupMediaMessage(ctx *ext.Context, update *ext.Update, message *tg.M
 		logger.Errorf("Failed to get file from media: %s", err)
 		return dispatcher.EndGroups
 	}
-	mediaGroupHandler.mu.Lock()
-	defer mediaGroupHandler.mu.Unlock()
 	key := mediaGroupKey{
 		chatID:  update.EffectiveChat().GetID(),
 		userID:  userId,
 		groupID: groupID,
 	}
+	// Trace every item that enters an album batch: when the saved files do not
+	// match what the user thinks they sent, this line shows exactly which
+	// message (msg id) and which document (size/name) the server delivered.
+	logger.Infof("[album] recv chat=%d user=%d msg=%d grouped=%d type=%s size=%d name=%q",
+		key.chatID, userId, message.GetID(), groupID, media.TypeName(), file.Size(), file.Name())
+	mediaGroupHandler.mu.Lock()
+	defer mediaGroupHandler.mu.Unlock()
 	if mediaGroupHandler.groups[key] == nil {
 		mediaGroupHandler.groups[key] = make([]tfile.TGFileMessage, 0)
 	}
@@ -105,6 +112,13 @@ func processMediaGroup(ctx *ext.Context, update *ext.Update, key mediaGroupKey) 
 		return
 	}
 	logger.Debugf("Processing media group %d with %d items", key.groupID, len(items))
+	msgIDs := make([]int, 0, len(items))
+	for _, it := range items {
+		if m := it.Message(); m != nil {
+			msgIDs = append(msgIDs, m.GetID())
+		}
+	}
+	logger.Infof("[album] flush chat=%d grouped=%d count=%d msg_ids=%v", key.chatID, key.groupID, len(items), msgIDs)
 
 	userId := update.GetUserChat().GetID()
 	msg, err := ctx.Reply(update, ext.ReplyTextString(i18n.T(i18nk.BotMsgMediaGroupInfoSavingFiles, nil)), nil)
