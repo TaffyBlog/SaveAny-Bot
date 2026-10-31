@@ -25,6 +25,33 @@ func IsSupported(media tg.MessageMediaClass) bool {
 	}
 }
 
+// DescribeMedia returns a short fingerprint of a media object: document/photo id,
+// resolution and duration. Logged together with the saved file so a file on disk
+// can always be traced back to the exact document Telegram delivered.
+func DescribeMedia(media tg.MessageMediaClass) string {
+	switch m := media.(type) {
+	case *tg.MessageMediaDocument:
+		doc, ok := m.Document.AsNotEmpty()
+		if !ok {
+			return "document(empty)"
+		}
+		for _, attr := range doc.Attributes {
+			if video, ok := attr.(*tg.DocumentAttributeVideo); ok {
+				return fmt.Sprintf("doc=%d %dx%d %s", doc.ID, video.W, video.H,
+					(time.Duration(video.Duration) * time.Second).String())
+			}
+		}
+		return fmt.Sprintf("doc=%d", doc.ID)
+	case *tg.MessageMediaPhoto:
+		photo, ok := m.Photo.AsNotEmpty()
+		if !ok {
+			return "photo(empty)"
+		}
+		return fmt.Sprintf("photo=%d", photo.ID)
+	}
+	return media.TypeName()
+}
+
 type FilenameTemplateData struct {
 	MsgID    string `json:"msgid,omitempty"`
 	MsgTags  string `json:"msgtags,omitempty"`

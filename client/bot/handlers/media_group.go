@@ -83,8 +83,9 @@ func handleGroupMediaMessage(ctx *ext.Context, update *ext.Update, message *tg.M
 	// Trace every item that enters an album batch: when the saved files do not
 	// match what the user thinks they sent, this line shows exactly which
 	// message (msg id) and which document (size/name) the server delivered.
-	logger.Infof("[album] recv chat=%d user=%d msg=%d grouped=%d type=%s size=%d name=%q",
-		key.chatID, userId, message.GetID(), groupID, media.TypeName(), file.Size(), file.Name())
+	logger.Infof("[album] recv chat=%d user=%d msg=%d grouped=%d type=%s size=%d name=%q %s",
+		key.chatID, userId, message.GetID(), groupID, media.TypeName(), file.Size(), file.Name(),
+		mediautil.DescribeMedia(media))
 	mediaGroupHandler.mu.Lock()
 	defer mediaGroupHandler.mu.Unlock()
 	if mediaGroupHandler.groups[key] == nil {
