@@ -32,6 +32,10 @@ WORKDIR /app
 
 COPY --from=builder /app/saveany-bot .
 COPY entrypoint.sh .
+# 内置 getxbot 兜底插件: 只有 [parser] plugin_enable = true 时才会被加载.
+# 挂载 ./plugins:/app/plugins 时会覆盖这里, 不挂也能直接用 plugin_dirs = ["./plugins"].
+# 示例插件 (example_*.js) 不打进镜像, 避免无关解析器进入兜底链.
+COPY --from=builder /app/plugins/getxbot_parser.js ./plugins/getxbot_parser.js
 
 RUN chmod +x /app/saveany-bot && \
     chmod +x /app/entrypoint.sh

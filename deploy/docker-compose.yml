@@ -3,9 +3,10 @@
 #   与下面的目录结构一起放到 NAS 上某个目录:
 #     ./docker-compose.yml
 #     ./config.toml                (由 config.example.toml 复制改名)
-#     ./plugins/getxbot_parser.js  (来自仓库 plugins/, getxbot 兜底插件需要)
+#     ./plugins/getxbot_parser.js  (可选: 覆盖镜像内置的同名插件)
 #     ./cookies.txt                (X 登录 cookies, 可选)
-#   data/ downloads/ cache/ 首次启动自动创建, plugins/ 需手动创建并放入插件
+#   data/ downloads/ cache/ 首次启动自动创建
+#   镜像已内置 plugins/getxbot_parser.js, 不挂载 ./plugins 也能用; 需要自定义插件时才建这个目录
 services:
   saveany-bot:
     image: ghcr.io/taffyblog/saveany-bot:latest # fork 镜像, push 到 main / 打 tag 后 Actions 自动构建 (已设为 Public, 免登录拉取)
@@ -18,7 +19,7 @@ services:
       - ./config.toml:/app/config.toml  # 配置文件
       - ./downloads:/app/downloads      # 视频落盘目录
       - ./cache:/app/cache              # 临时下载目录
-      - ./plugins:/app/plugins          # JS 解析器插件 (getxbot 兜底)
+      - ./plugins:/app/plugins          # 可选: 自定义/覆盖 JS 解析器插件 (镜像已内置 getxbot_parser.js)
       - ./cookies.txt:/app/cookies.txt:ro # X 登录 cookies (可选, 没有则删除此行)
     # 若 NAS 需要代理出网, 取消注释 (容器内进程读取):
     # environment:

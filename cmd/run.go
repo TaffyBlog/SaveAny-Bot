@@ -83,6 +83,13 @@ func initAll(ctx context.Context) (<-chan struct{}, error) {
 	storage.LoadStorages(ctx)
 	if config.C().Parser.PluginEnable {
 		for _, dir := range config.C().Parser.PluginDirs {
+			if _, statErr := os.Stat(dir); statErr != nil {
+				// Missing dir is not fatal: the official image ships getxbot_parser.js
+				// inside /app/plugins, and a mounted ./plugins can legitimately be absent.
+				logger.Warnf("Parser plugin dir %q not found, plugins from this dir are skipped "+
+					"(mount ./plugins:/app/plugins or fix parser.plugin_dirs)", dir)
+				continue
+			}
 			if err := parsers.LoadPlugins(ctx, dir); err != nil {
 				logger.Error("Failed to load parser plugins", "dir", dir, "error", err)
 			} else {
