@@ -1,8 +1,8 @@
 # SaveAny-Bot NAS 部署 (使用 fork 的 GHCR 镜像, 免构建)
-# 用法: 与 deploy/config.toml 一起放到 NAS 上某个目录,
-#   目录结构:
+# 用法: 把 deploy/config.example.toml 复制为 config.toml 填入必改项,
+#   与下面的目录结构一起放到 NAS 上某个目录:
 #     ./docker-compose.yml
-#     ./config.toml
+#     ./config.toml                (由 config.example.toml 复制改名)
 #     ./plugins/getxbot_parser.js  (来自仓库 plugins/, getxbot 兜底插件需要)
 #     ./cookies.txt                (X 登录 cookies, 可选)
 #   data/ downloads/ cache/ 首次启动自动创建, plugins/ 需手动创建并放入插件

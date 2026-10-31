@@ -25,7 +25,7 @@
    - (推荐) X 账号导出的 cookies.txt (Netscape 格式, 可用浏览器插件 "Get cookies.txt LOCALLY" 导出)
 2. **上传文件到 NAS**: 在 NAS 上建一个目录, 放入:
    - `docker-compose.yml` (来自 `deploy/docker-compose.yml`)
-   - `config.toml` (来自 `deploy/config.toml`, 填好所有 "!!必改!!" 项)
+   - `config.toml` (来自 `deploy/config.example.toml`, **复制并重命名为 `config.toml`**, 填好所有 "!!必改!!" 项)
    - `cookies.txt` (可选)
    - `plugins/getxbot_parser.js` (放到 NAS 的 `plugins/` 目录, getxbot 兜底插件需要)
 
@@ -64,6 +64,10 @@
 ## 常见问题
 
 - **换 Bot token 后报错**: 删除 `data/session.db` 后重启容器。
+- **能解析但下载失败 (`connection reset by peer`)**: 国内直连 `video.twimg.com` (Fastly) 会被重置, 日志形如
+  `read tcp [2409:...]->[2a04:4e42:...]:443: read: connection reset by peer`。给 `[parser] proxy`
+  配上代理即可 (这一项同时控制解析器请求和视频文件下载; `[parser.twitter] proxy` 只管 fxtwitter API)。
+  验证: `docker compose exec saveany-bot curl -x socks5h://<代理地址> -o /dev/null -w "%{http_code}\n" https://video.twimg.com/`
 - **画质不对**: 确认 `[ytdlp] max_height = 0`; fxtwitter 链路返回的就是源视频最高码率 variant, 无需额外配置。
 - **NSFW 仍失败**: 确认 cookies.txt 有效 (在浏览器中登录 X 后重新导出) 且 `cookies_file` 路径正确; cookies 过期需重新导出。
 - **容器内时间/编码**: 配置文件必须 UTF-8 编码。
