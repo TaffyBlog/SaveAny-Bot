@@ -277,6 +277,13 @@ func CreateAndAddBatchTGFileTaskWithEdit(ctx *ext.Context, userID int64, stor st
 		return dispatcher.EndGroups
 	}
 	taskid := xid.New().String()
+	// Log where this batch came from: when a forwarded album (media group) is
+	// saved, it is easy to wonder why unrelated-looking files were downloaded.
+	names := make([]string, 0, len(elems))
+	for _, e := range elems {
+		names = append(names, e.File.Name())
+	}
+	logger.Infof("Creating batch file task %s with %d files: %s", taskid, len(elems), strings.Join(names, ", "))
 	task := batchtfile.NewBatchTGFileTask(taskid, injectCtx, elems, batchtfile.NewProgressTrackerWithSkipped(trackMsgID, userID, skipped), true)
 	if err := core.AddTask(injectCtx, task); err != nil {
 		logger.Errorf("Failed to add batch task: %s", err)
